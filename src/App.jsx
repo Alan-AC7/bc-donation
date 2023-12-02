@@ -45,13 +45,13 @@ export default function App() {
 
   return (
     <main>
-      <h1 class= "font-bold">Bitcoin Connect Donation Modal Demo</h1>
-      <p>
+      <h1 class= "font-bold text-[rgb(25,108,233)]">Bitcoin Connect Donation Modal Demo</h1>
+      <p class='text-[rgb(25,108,233)]'>
         This client side web application will request permission to donate to a lightning adrress using Bitcoin Connect.
       </p>
       <br></br>
       <Modal />
-      <form class="max-w-sm mx-auto border-4 border-[rgb(25,108,233)] p-4 rounded-lg grid gap-4 md:flex-1 md:max-w-md my-2 md:my-8 lg:my-10 bg-white dark:bg-neutral-800 w-full">
+      <form class="bg-neutral-800 text-[rgb(25,108,233)] max-w-sm mx-auto border-4 border-[rgb(25,108,233)] text-[rgb(25,108,233)] p-4 rounded-lg grid gap-4 md:flex-1 md:max-w-md my-2 md:my-8 lg:my-10 bg-white dark:bg-white w-full">
   <label>
     Lightning Address:
     <br></br>
@@ -61,7 +61,8 @@ export default function App() {
       name="address"
       value={donationData.address}
       onChange={handleInputChange}
-      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      required
+      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-50 dark:border-[rgb(25,108,233)] dark:placeholder-[rgb(25,108,233)] dark:text-[rgb(25,108,233)] dark:focus:ring-blue-500 dark:focus:border-[rgb(25,108,233)] dark:bg-gray-50"
     />
   <label class='m'>
     <br></br>
@@ -72,7 +73,8 @@ export default function App() {
       name="amount"
       value={donationData.amount}
       onChange={handleInputChange}
-      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-50 dark:border-[rgb(25,108,233)] dark:placeholder-[rgb(25,108,233)] dark:text-[rgb(25,108,233)] dark:focus:ring-blue-500 dark:focus:border-[rgb(25,108,233)] dark:bg-gray-50"
+      required
     />
   
   <br></br>
