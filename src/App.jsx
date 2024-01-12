@@ -1,64 +1,76 @@
-import './App.css';
-import React, { useState, useEffect } from "react";
+import "./App.css";
+import React, { useState } from "react";
 import { LightningAddress } from "@getalby/lightning-tools";
-import { Modal, launchModal, disconnect } from "@getalby/bitcoin-connect-react";
+import { launchPaymentModal } from "@getalby/bitcoin-connect-react";
 
 export default function App() {
-  const [invoice, setInvoice] = useState('');
-  const [connected, setConnected] = useState(false);
   const [donationData, setDonationData] = useState({
-    address: '',
-    amount: ''
+    address: "",
+    amount: "",
   });
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setDonationData((prevData) => ({
       ...prevData,
-      [name]: value
+      [name]: value,
     }));
   };
 
-  useEffect(() => {
-    window.addEventListener("bc:connected", () => {
-      setConnected(true);
-    });
-    window.addEventListener("bc:disconnected", () => {
-      setConnected(false);
-    });
-  }, []);
-
-  useEffect(() => {
-    const generateInvoice = async () => {
-      const ln = new LightningAddress(donationData.address);
-      await ln.fetch();
-      const invoice = await ln.requestInvoice({ satoshi: donationData.amount });
-      setInvoice(invoice.paymentRequest);
-    };
-
-    generateInvoice();
-  }, [donationData.address, donationData.amount]);
-
-  const handleDonation = () => {
+  const handleDonation = async () => {
     if (!donationData.address || !donationData.amount) {
       alert("Please fill in both Lightning Address and Amount.");
       return;
     }
 
-    launchModal({ invoice });
+    const ln = new LightningAddress(donationData.address);
+    await ln.fetch();
+    const invoice = await ln.requestInvoice({ satoshi: donationData.amount });
+
+    const { setPaid } = launchPaymentModal({
+      invoice: invoice.paymentRequest,
+      onPaid: ({ preimage }) => {
+        clearInterval(checkPaymentInterval);
+        alert(
+          "Paid to:  " +
+            donationData.address +
+            " amount: " +
+            donationData.amount +
+            " sats" +
+            " preimage: " +
+            preimage,
+        );
+      },
+      onCancelled: () => {
+        alert("Payment cancelled");
+      },
+    });
+    const checkPaymentInterval = setInterval(async () => {
+      const paid = await invoice.verifyPayment();
+
+      if (paid && invoice.preimage) {
+        setPaid({
+          preimage: invoice.preimage,
+        });
+      }
+    }, 1000);
   };
 
   return (
     <main>
-      <h1 className="font-bold text-[rgb(25,108,233)]">Bitcoin Connect Donation Modal Demo</h1>
-      <p className="text-[rgb(25,108,233)]">
-        This client side web application will request permission to donate to a lightning address using Bitcoin Connect.
+      <br />
+      <h1 className="font-bold text-[rgb(25,108,233)] text-4xl text-center">
+        Bitcoin Connect Donation Modal Demo
+      </h1>
+      <br />
+      <p className="text-[rgb(25,108,233)] text-2xl text-center justify-center">
+        This client side web application will request permission to donate to a
+        lightning address using Bitcoin Connect.
       </p>
 
-      <Modal />
-
+      <br />
       <form className="bg-neutral-800 text-[rgb(25,108,233)] max-w-sm mx-auto border-4 border-[rgb(25,108,233)] text-[rgb(25,108,233)] p-4 rounded-lg grid gap-4 md:flex-1 md:max-w-md my-2 md:my-8 lg:my-10 bg-white dark:bg-white w-full">
-        <label>
+        <label className="text-center font-bold">
           Lightning Address:
           <br />
         </label>
@@ -71,7 +83,7 @@ export default function App() {
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-50 dark:border-[rgb(25,108,233)] dark:placeholder-[rgb(25,108,233)] dark:text-[rgb(25,108,233)] dark:focus:ring-blue-500 dark:focus:border-[rgb(25,108,233)] dark:bg-gray-50"
         />
 
-        <label className="m">
+        <label className="m text-center font-bold">
           <br />
           Amount (sats):
         </label>
@@ -92,17 +104,6 @@ export default function App() {
         >
           Send Donation
         </button>
-        {connected && (
-          <button
-            onClick={() => {
-              disconnect();
-              setConnected(false);
-            }}
-            className="text-white bg-[rgb(25,108,233)] text-white hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full px-4 py-2"
-          >
-            Disconnect
-          </button>
-        )}
       </form>
 
       <br />
